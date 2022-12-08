@@ -1,19 +1,21 @@
-﻿using System.Data;
+﻿using Newtonsoft.Json;
+using System.Data;
 using System.Data.SqlClient;
+
 
 
 namespace demo_back.model
 {
     public class db
     {
-        SqlConnection con = new SqlConnection("Data Source=(localdb)\\LocalDb;Initial Catalog=myLocalDb;Integrated Security=True\" providerName=\"System.Data.SqlClient");
+        SqlConnection con = new SqlConnection("Data Source=(localdb)\\LocalDb;Initial Catalog=myLocalDb;Integrated Security=True");
         public string EmployeeOpt(Employee emp)
         {
             string mess = string.Empty;
             try
             {
 
-                SqlCommand cmd = new SqlCommand("[dbo].[insertRegistration]", con);
+                SqlCommand cmd = new SqlCommand("[dbo].[Registration]", con);
                 cmd.CommandType = CommandType.StoredProcedure;
                 cmd.Parameters.AddWithValue("@firstName", emp.FirstName);
                 cmd.Parameters.AddWithValue("@lastName", emp.LastName);
@@ -21,9 +23,10 @@ namespace demo_back.model
                 cmd.Parameters.AddWithValue("@mobile", emp.Mobile);
                 cmd.Parameters.AddWithValue("@password", emp.Password);
                 cmd.Parameters.AddWithValue("@dob", emp.DateOfBirth);
+                cmd.Parameters.AddWithValue("@type", emp.type);
 
                 con.Open();
-                var i = cmd.ExecuteNonQuery();
+                cmd.ExecuteNonQuery();
                 con.Close();
                 mess = "Registered has been successfully.";
             }
@@ -39,46 +42,49 @@ namespace demo_back.model
                     con.Close();
                 }
             }
-            return mess;
-
+            return JsonConvert.SerializeObject(mess);
         }
-
-        public string EmployeeGet(Employee emp)
+        public DataSet EmployeeGet(Employee emp,out string msg)
         {
-            string mess = string.Empty;
+             msg = string.Empty;
+            DataSet ds= new DataSet();
             try
             {
 
-                SqlCommand cmd = new SqlCommand("[dbo].[insertRegistration]", con);
+                SqlCommand cmd = new SqlCommand("[dbo].[Registration]", con);
                 cmd.CommandType = CommandType.StoredProcedure;
-                cmd.Parameters.AddWithValue("@firstName", emp.FirstName);
-                cmd.Parameters.AddWithValue("@lastName", emp.LastName);
-                cmd.Parameters.AddWithValue("@email", emp.Email);
-                cmd.Parameters.AddWithValue("@mobile", emp.Mobile);
-                cmd.Parameters.AddWithValue("@password", emp.Password);
-                cmd.Parameters.AddWithValue("@dob", emp.DateOfBirth);
-
-                con.Open();
-                var i = cmd.ExecuteNonQuery();
-                con.Close();
-                mess = "Registered has been successfully.";
+                SqlDataAdapter da=new SqlDataAdapter(cmd);
+                da.Fill(ds);
+                msg = "SUCCESS";  
             }
             catch (Exception ex)
             {
-                mess = ex.Message;
+                msg = ex.Message;
             }
 
-            finally
-            {
-                if (con.State == ConnectionState.Open)
-                {
-                    con.Close();
-                }
-            }
-            return mess;
+            return ds;
         }
-     }
+        public DataSet getByIDEmployee(Employee emp, out string msg)
+        {
+            msg = string.Empty;
+            DataSet ds = new DataSet();
+            try
+            {
 
+                SqlCommand cmd = new SqlCommand("[dbo].[Registration]", con);
+                cmd.CommandType = CommandType.StoredProcedure;
+                SqlDataAdapter da = new SqlDataAdapter(cmd);
+                da.Fill(ds);
+                msg = "SUCCESS";
+            }
+            catch (Exception ex)
+            {
+                msg = ex.Message;
+            }
 
+            return ds;
+        }
 
     }
+
+}

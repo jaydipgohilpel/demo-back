@@ -6,6 +6,8 @@ using System.Data;
 using System.Data.SqlClient;
 using System.Net;
 using System.Web.Http.Cors;
+using demo_back.model;
+using System.Reflection;
 
 // For more information on enabling Web API for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
 
@@ -18,68 +20,114 @@ namespace demo_back.Controllers
     {
     
         SqlConnection con = new SqlConnection("Data Source=(localdb)\\LocalDb;Initial Catalog=myLocalDb;Integrated Security=True");
+        string msg = String.Empty;
+        db drop = new db();
+
         // GET: api/<EmployeeController>
-        //[HttpGet]
-        /*public IEnumerable<string> Get()
+        [HttpGet]
+        public List<Employee> Get()
         {
-            return new string[] { "value1", "value2" };
+            Employee emp = new Employee();
+            emp.type = "getAll";
+            DataSet ds = drop.EmployeeGet(emp,out msg);
+            List<Employee> list = new List<Employee>();
+             foreach(DataRow  dr in ds.Tables[0].Rows) {
+                list.Add(new Employee
+                {
+                   Id = Convert.ToInt32(dr["id"]),
+                   FirstName = dr["firstName"].ToString(),
+                   LastName = dr["lastName"].ToString(),
+                   Email = dr["email"].ToString(),
+                   Mobile = dr["mobile"].ToString(),
+                   Password = dr["password"].ToString(),
+                   DateOfBirth = dr["dob"].ToString(),
+                   CreatedAt = dr["createdAt"].ToString(),
+                   UpdatedAt = dr["updatedAt"].ToString(),
+                   IsActive = dr["isActive"].ToString(),
+                });
+            }
+            return list;
         }
-        */
+        
         // GET api/<EmployeeController>/5
         [HttpGet("{id}")]
-        public string Get(int id)
+        public List<Employee> Get(int id)
         {
-            return "value";
+            Employee emp = new Employee();
+            emp.Id = id;
+            emp.type = "getID";
+            DataSet ds = drop.EmployeeGet(emp, out msg);
+            List<Employee> list = new List<Employee>();
+            foreach (DataRow dr in ds.Tables[0].Rows)
+            {
+                list.Add(new Employee
+                {
+                    Id = Convert.ToInt32(dr["id"]),
+                    FirstName = dr["firstName"].ToString(),
+                    LastName = dr["lastName"].ToString(),
+                    Email = dr["email"].ToString(),
+                    Mobile = dr["mobile"].ToString(),
+                    Password = dr["password"].ToString(),
+                    DateOfBirth = dr["dob"].ToString(),
+                    CreatedAt = dr["createdAt"].ToString(),
+                    UpdatedAt = dr["updatedAt"].ToString(),
+                    IsActive = dr["isActive"].ToString(),
+                });
+            }
+            return list;
         }
 
         // POST api/<EmployeeController>
         [HttpPost]
         public string Post([FromBody] Employee emp)
         {
-            string mess = string.Empty;
+            String msg = string.Empty;
             try
             {
-
-                SqlCommand cmd = new SqlCommand("[dbo].[insertRegistration]", con);
-                cmd.CommandType = CommandType.StoredProcedure;
-                cmd.Parameters.AddWithValue("@firstName", emp.FirstName);
-                cmd.Parameters.AddWithValue("@lastName", emp.LastName);
-                cmd.Parameters.AddWithValue("@email", emp.Email);
-                cmd.Parameters.AddWithValue("@mobile", emp.Mobile);
-                cmd.Parameters.AddWithValue("@password", emp.Password);
-                cmd.Parameters.AddWithValue("@dob", emp.DateOfBirth);
-
-                con.Open();
-                cmd.ExecuteNonQuery();
-                con.Close();
-                mess = "Registered has been successfully.";
+                emp.type = "insert";
+                msg = drop.EmployeeOpt(emp);
             }
-            catch (Exception ex)
+            catch(Exception ex)
             {
-                mess = ex.Message;
+                msg= ex.Message;
             }
-
-            finally
-            {
-                if (con.State == ConnectionState.Open)
-                {
-                    con.Close();
-                }
-            }
-            string output = JsonConvert.SerializeObject(mess);
-            return mess;
+            return JsonConvert.SerializeObject(msg);
         }
 
         // PUT api/<EmployeeController>/5
         [HttpPut("{id}")]
-        public void Put(int id, [FromBody] string value)
+        public string put(int id,[FromBody] Employee emp)
         {
+            String msg = string.Empty;
+            try
+            {
+                emp.Id = id;
+                emp.type = "update";
+                msg = drop.EmployeeOpt(emp);
+            }
+            catch (Exception ex)
+            {
+                msg = ex.Message;
+            }
+            return JsonConvert.SerializeObject(msg);
         }
 
         // DELETE api/<EmployeeController>/5
         [HttpDelete("{id}")]
-        public void Delete(int id)
+        public string Delete(int id)
         {
+            String msg = string.Empty;
+            try
+            {
+                Employee emp=new Employee();
+                emp.Id = id;    
+                msg = drop.EmployeeOpt(emp);
+            }
+            catch (Exception ex)
+            {
+                msg = ex.Message;
+            }
+            return JsonConvert.SerializeObject(msg);
         }
     }
 }

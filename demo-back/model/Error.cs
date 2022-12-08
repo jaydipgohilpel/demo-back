@@ -9,8 +9,10 @@ namespace demo_proj_backend.Models
     {
         [DataMember(Name = "information", EmitDefaultValue = false)]
         public string Information { get; set; }
+
         [DataMember(Name = "status", EmitDefaultValue = false)]
         public int Status { get; set; }
+
         [DataMember(Name = "message", EmitDefaultValue = false)]
         public string Message { get; set; }
     }
