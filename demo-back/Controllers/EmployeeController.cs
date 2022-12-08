@@ -120,7 +120,8 @@ namespace demo_back.Controllers
             try
             {
                 Employee emp=new Employee();
-                emp.Id = id;    
+                emp.Id = id;
+                emp.type = "delete";
                 msg = drop.EmployeeOpt(emp);
             }
             catch (Exception ex)

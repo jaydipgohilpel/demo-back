@@ -14,7 +14,6 @@ namespace demo_back.model
             string mess = string.Empty;
             try
             {
-
                 SqlCommand cmd = new SqlCommand("[dbo].[Registration]", con);
                 cmd.CommandType = CommandType.StoredProcedure;
                 cmd.Parameters.AddWithValue("@firstName", emp.FirstName);
@@ -24,11 +23,14 @@ namespace demo_back.model
                 cmd.Parameters.AddWithValue("@password", emp.Password);
                 cmd.Parameters.AddWithValue("@dob", emp.DateOfBirth);
                 cmd.Parameters.AddWithValue("@type", emp.type);
-
+                if(emp.type=="update" || emp.type=="delete")
+                {
+                    cmd.Parameters.AddWithValue("@id", emp.Id);
+                }
                 con.Open();
-                cmd.ExecuteNonQuery();
+               var i= cmd.ExecuteNonQuery();
                 con.Close();
-                mess = "Registered has been successfully.";
+                mess = "successfully.";
             }
             catch (Exception ex)
             {
@@ -50,12 +52,13 @@ namespace demo_back.model
             DataSet ds= new DataSet();
             try
             {
-
-                SqlCommand cmd = new SqlCommand("[dbo].[Registration]", con);
+                SqlCommand cmd = new SqlCommand("[dbo].[GetData]", con);
                 cmd.CommandType = CommandType.StoredProcedure;
+                cmd.Parameters.AddWithValue("@type", emp.type);
+                cmd.Parameters.AddWithValue("@id", emp.Id);
                 SqlDataAdapter da=new SqlDataAdapter(cmd);
                 da.Fill(ds);
-                msg = "SUCCESS";  
+                msg = "SUCCESS";   
             }
             catch (Exception ex)
             {
@@ -64,26 +67,7 @@ namespace demo_back.model
 
             return ds;
         }
-        public DataSet getByIDEmployee(Employee emp, out string msg)
-        {
-            msg = string.Empty;
-            DataSet ds = new DataSet();
-            try
-            {
-
-                SqlCommand cmd = new SqlCommand("[dbo].[Registration]", con);
-                cmd.CommandType = CommandType.StoredProcedure;
-                SqlDataAdapter da = new SqlDataAdapter(cmd);
-                da.Fill(ds);
-                msg = "SUCCESS";
-            }
-            catch (Exception ex)
-            {
-                msg = ex.Message;
-            }
-
-            return ds;
-        }
+        
 
     }
 
