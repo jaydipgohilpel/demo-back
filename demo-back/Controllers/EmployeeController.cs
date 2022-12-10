@@ -1,5 +1,4 @@
 ﻿using demo_back.model;
-using demo_proj_backend.common;
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
 using System.Data;
@@ -8,6 +7,8 @@ using System.Net;
 using System.Web.Http.Cors;
 using demo_back.model;
 using System.Reflection;
+using demo_proj_backend.Models;
+using System.Net.Http;
 
 // For more information on enabling Web API for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
 
@@ -18,10 +19,10 @@ namespace demo_back.Controllers
     [Route("api/[controller]")]
     public class EmployeeController : ControllerBase
     {
-    
+
         SqlConnection con = new SqlConnection("Data Source=(localdb)\\LocalDb;Initial Catalog=myLocalDb;Integrated Security=True");
         string msg = String.Empty;
-        db drop = new db();
+        BoEmployee drop = new BoEmployee();
 
         // GET: api/<EmployeeController>
         [HttpGet]
@@ -79,24 +80,33 @@ namespace demo_back.Controllers
 
         // POST api/<EmployeeController>
         [HttpPost]
-        public string Post([FromBody] Employee emp)
+        public ObjectResult Post([FromBody] Employee emp)
         {
+            //HttpRequest Request = HttpContext.Current.Request;
+        
             String msg = string.Empty;
             try
             {
                 emp.type = "insert";
                 msg = drop.EmployeeOpt(emp);
+
+                //return StatusCode((int)HttpStatusCode.OK, msg);
             }
             catch(Exception ex)
             {
-                msg= ex.Message;
+                return StatusCode((int)HttpStatusCode.BadRequest, ex.Message); 
+            
             }
-            return JsonConvert.SerializeObject(msg);
+            
+            return StatusCode((int)HttpStatusCode.OK, msg);
+
+            //return JsonConvert.SerializeObject(msg);emp
+            //   return Global.CreateResponse( HttpStatusCode.OK, "data inserted successfully!!!");
         }
 
         // PUT api/<EmployeeController>/5
         [HttpPut("{id}")]
-        public string put(int id,[FromBody] Employee emp)
+        public ObjectResult put(int id,[FromBody] Employee emp)
         {
             String msg = string.Empty;
             try
@@ -107,14 +117,15 @@ namespace demo_back.Controllers
             }
             catch (Exception ex)
             {
-                msg = ex.Message;
+                return StatusCode((int)HttpStatusCode.BadRequest, ex.Message);
             }
-            return JsonConvert.SerializeObject(msg);
+ 
+            return StatusCode((int)HttpStatusCode.OK, msg);
         }
 
         // DELETE api/<EmployeeController>/5
         [HttpDelete("{id}")]
-        public string Delete(int id)
+        public ObjectResult Delete(int id)
         {
             String msg = string.Empty;
             try
@@ -126,9 +137,9 @@ namespace demo_back.Controllers
             }
             catch (Exception ex)
             {
-                msg = ex.Message;
+                return StatusCode((int)HttpStatusCode.BadRequest, ex.Message);
             }
-            return JsonConvert.SerializeObject(msg);
+            return StatusCode((int)HttpStatusCode.OK, msg);
         }
     }
 }

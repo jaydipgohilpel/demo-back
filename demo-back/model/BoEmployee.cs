@@ -6,7 +6,7 @@ using System.Data.SqlClient;
 
 namespace demo_back.model
 {
-    public class db
+    public class BoEmployee
     {
         SqlConnection con = new SqlConnection("Data Source=(localdb)\\LocalDb;Initial Catalog=myLocalDb;Integrated Security=True");
         public string EmployeeOpt(Employee emp)
@@ -28,9 +28,20 @@ namespace demo_back.model
                     cmd.Parameters.AddWithValue("@id", emp.Id);
                 }
                 con.Open();
-               var i= cmd.ExecuteNonQuery();
+                var i= cmd.ExecuteNonQuery();
                 con.Close();
-                mess = "successfully.";
+                if(emp.type == "insert")
+                {
+                  mess = "Registration Successfully.";
+                }
+                else if(emp.type == "update")
+                {
+                    mess = "Update Successfully.";
+                }  
+                else if(emp.type == "delete")
+                {
+                    mess = "Delete Successfully.";
+                }
             }
             catch (Exception ex)
             {
@@ -58,7 +69,7 @@ namespace demo_back.model
                 cmd.Parameters.AddWithValue("@id", emp.Id);
                 SqlDataAdapter da=new SqlDataAdapter(cmd);
                 da.Fill(ds);
-                msg = "SUCCESS";   
+                msg = "Successfully.";   
             }
             catch (Exception ex)
             {

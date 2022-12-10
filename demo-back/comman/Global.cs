@@ -1,29 +1,19 @@
-﻿
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Net.Http;
+﻿using demo_proj_backend.Models;
 using System.Net;
-using System.Web;
-using demo_proj_backend.Models;
 using System.Reflection;
 
-namespace demo_proj_backend.common
+namespace demo_back.comman
 {
-    public static class Global
+    public class Global
     {
-        public static string ConnectionString { get; set; }
-
         public static HttpResponseMessage CreateResponse(HttpRequestMessage pRequest, HttpStatusCode pStatusCode, string pStrMessage)
         {
-            Models.Error pObjResponse = new Models.Error
+           Error pObjResponse = new Error
             {
                 Status = (int)pStatusCode,
                 Message = pStrMessage
             };
             return pRequest.CreateResponse((HttpStatusCode)pObjResponse.Status, pObjResponse);
         }
-
-     
     }
 }

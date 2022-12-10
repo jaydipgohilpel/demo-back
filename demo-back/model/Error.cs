@@ -7,14 +7,14 @@ namespace demo_proj_backend.Models
     [DataContract(Name = "Response")]
     public class Error
     {
-        [DataMember(Name = "information", EmitDefaultValue = false)]
-        public string Information { get; set; }
+        [DataMember(Name = "Message", EmitDefaultValue = false)]
+        public string Message { get; set; } = " ";
 
-        [DataMember(Name = "status", EmitDefaultValue = false)]
+        [DataMember(Name = "Status", EmitDefaultValue = false)]
         public int Status { get; set; }
 
-        [DataMember(Name = "message", EmitDefaultValue = false)]
-        public string Message { get; set; }
+        [DataMember(Name = "header", EmitDefaultValue = false)]
+        public string header { get; set; } = " ";
     }
 }
 
