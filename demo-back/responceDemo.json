@@ -1,0 +1,10 @@
+{
+  "message": "Http failure during parsing for https://localhost:7294/api/Employee",
+  "name": "HttpErrorResponse",
+  "ok": false,
+  "status": 200,
+  "statusText": "OK",
+  "url": "https://localhost:7294/api/Employee",
+  "headers": "HttpHeaders"  
+
+}

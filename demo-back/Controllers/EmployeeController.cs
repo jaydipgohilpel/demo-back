@@ -5,10 +5,14 @@ using System.Data;
 using System.Data.SqlClient;
 using System.Net;
 using System.Web.Http.Cors;
-using demo_back.model;
 using System.Reflection;
 using demo_proj_backend.Models;
 using System.Net.Http;
+using demo_back.Handler;
+using Microsoft.Extensions.Configuration;
+using demo_back.comman;
+using System.Globalization;
+
 
 // For more information on enabling Web API for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
 
@@ -17,53 +21,57 @@ namespace demo_back.Controllers
 
     [ApiController]
     [Route("api/[controller]")]
+
     public class EmployeeController : ControllerBase
     {
 
-        SqlConnection con = new SqlConnection("Data Source=(localdb)\\LocalDb;Initial Catalog=myLocalDb;Integrated Security=True");
         string msg = String.Empty;
         BoEmployee drop = new BoEmployee();
+        PostDataResponseHelper Responce = new PostDataResponseHelper();
+        GetDataResponseHelper GetDataResponce = new GetDataResponseHelper();
 
         // GET: api/<EmployeeController>
         [HttpGet]
-        public List<Employee> Get()
+        public GetDataResponseHelper Get()
         {
-            Employee emp = new Employee();
-            emp.type = "getAll";
-            DataSet ds = drop.EmployeeGet(emp,out msg);
-            List<Employee> list = new List<Employee>();
-             foreach(DataRow  dr in ds.Tables[0].Rows) {
-                list.Add(new Employee
-                {
-                   Id = Convert.ToInt32(dr["id"]),
-                   FirstName = dr["firstName"].ToString(),
-                   LastName = dr["lastName"].ToString(),
-                   Email = dr["email"].ToString(),
-                   Mobile = dr["mobile"].ToString(),
-                   Password = dr["password"].ToString(),
-                   DateOfBirth = dr["dob"].ToString(),
-                   CreatedAt = dr["createdAt"].ToString(),
-                   UpdatedAt = dr["updatedAt"].ToString(),
-                   IsActive = dr["isActive"].ToString(),
-                });
-            }
-            return list;
-        }
-        
-        // GET api/<EmployeeController>/5
-        [HttpGet("{id}")]
-        public List<Employee> Get(int id)
-        {
-            Employee emp = new Employee();
-            emp.Id = id;
-            emp.type = "getID";
-            DataSet ds = drop.EmployeeGet(emp, out msg);
-            List<Employee> list = new List<Employee>();
+            EmployeeModel emp = new EmployeeModel();
+            emp.Type = "getAll";
+            DataSet ds = drop.GetEmployeeDetailsByIdAndAll(emp, out msg);
+            List<EmployeeModel> list = new List<EmployeeModel>();
             foreach (DataRow dr in ds.Tables[0].Rows)
             {
-                list.Add(new Employee
+                list.Add(new EmployeeModel
                 {
-                    Id = Convert.ToInt32(dr["id"]),
+                    Id = ((int?)dr["id"]),
+                    FirstName = dr["firstName"].ToString(),
+                    LastName = dr["lastName"].ToString(),
+                    Email = dr["email"].ToString(),
+                    Mobile = dr["mobile"].ToString(),
+                    Password =dr["password"].ToString(),
+                    DateOfBirth = dr["dob"].ToString(),
+                    CreatedAt = dr["createdAt"].ToString(),
+                    UpdatedAt =dr["updatedAt"].ToString(),
+                    IsActive = (int?)dr["isActive"],
+                });
+            }
+            GetDataResponce.Data = list;
+            return GetDataResponce;
+        }
+
+        // GET api/<EmployeeController>/5
+        [HttpGet("{id}")]
+        public List<EmployeeModel> Get(int id)
+        {
+            EmployeeModel emp = new EmployeeModel();
+            emp.Id = id;
+            emp.Type = "getID";
+            DataSet ds = drop.GetEmployeeDetailsByIdAndAll(emp, out msg);
+            List<EmployeeModel> list = new List<EmployeeModel>();
+            foreach (DataRow dr in ds.Tables[0].Rows)
+            {
+                list.Add(new EmployeeModel
+                {
+                    Id = ((int?)dr["id"]),
                     FirstName = dr["firstName"].ToString(),
                     LastName = dr["lastName"].ToString(),
                     Email = dr["email"].ToString(),
@@ -72,7 +80,7 @@ namespace demo_back.Controllers
                     DateOfBirth = dr["dob"].ToString(),
                     CreatedAt = dr["createdAt"].ToString(),
                     UpdatedAt = dr["updatedAt"].ToString(),
-                    IsActive = dr["isActive"].ToString(),
+                    IsActive = (int?)dr["isActive"],
                 });
             }
             return list;
@@ -80,66 +88,90 @@ namespace demo_back.Controllers
 
         // POST api/<EmployeeController>
         [HttpPost]
-        public ObjectResult Post([FromBody] Employee emp)
+        public PostDataResponseHelper Post([FromBody] EmployeeModel emp)
         {
-            //HttpRequest Request = HttpContext.Current.Request;
-        
             String msg = string.Empty;
             try
             {
-                emp.type = "insert";
-                msg = drop.EmployeeOpt(emp);
-
-                //return StatusCode((int)HttpStatusCode.OK, msg);
+                emp.Type = "insert";
+                msg = drop.AddAndUpdatEmployeeDetails(emp);
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
-                return StatusCode((int)HttpStatusCode.BadRequest, ex.Message); 
-            
-            }
-            
-            return StatusCode((int)HttpStatusCode.OK, msg);
 
-            //return JsonConvert.SerializeObject(msg);emp
-            //   return Global.CreateResponse( HttpStatusCode.OK, "data inserted successfully!!!");
+                Responce.Status = (int)HttpStatusCode.BadRequest;
+                Responce.Message = ex.Message;
+                Responce.StatusText = "BadRequest";
+                Responce.Headers = "Registraion Failed ,Record is Not Inserted.";
+                Responce.Ok = false;
+                return Responce;
+
+            }
+            Responce.Status = (int)HttpStatusCode.Created;
+            Responce.Message = msg;
+            Responce.StatusText = "Created";
+            Responce.Ok=true;
+            return Responce;
+
         }
 
         // PUT api/<EmployeeController>/5
         [HttpPut("{id}")]
-        public ObjectResult put(int id,[FromBody] Employee emp)
+        public PostDataResponseHelper put(int id, [FromBody] EmployeeModel emp)
         {
             String msg = string.Empty;
             try
             {
                 emp.Id = id;
-                emp.type = "update";
-                msg = drop.EmployeeOpt(emp);
+                emp.Type = "update";
+                msg = drop.AddAndUpdatEmployeeDetails(emp);
             }
             catch (Exception ex)
             {
-                return StatusCode((int)HttpStatusCode.BadRequest, ex.Message);
+                Responce.Status = (int)HttpStatusCode.BadRequest;
+                Responce.Message = ex.Message;
+                Responce.StatusText = "BadRequest";
+                Responce.Headers = "Updation Failed , Record is not Updated, ";
+                Responce.Ok = false;
+                return Responce;
             }
- 
-            return StatusCode((int)HttpStatusCode.OK, msg);
+            Responce.Status = (int)HttpStatusCode.OK;
+            Responce.Message = msg;
+            Responce.StatusText = "Ok";
+            Responce.Ok = true;
+            return Responce;
+
         }
 
         // DELETE api/<EmployeeController>/5
         [HttpDelete("{id}")]
-        public ObjectResult Delete(int id)
+        public PostDataResponseHelper Delete(int id)
         {
             String msg = string.Empty;
             try
             {
-                Employee emp=new Employee();
+                EmployeeModel emp = new EmployeeModel();
                 emp.Id = id;
-                emp.type = "delete";
-                msg = drop.EmployeeOpt(emp);
+                emp.Type = "delete";
+                msg = drop.DeleteEmployeeDetails(emp);
             }
             catch (Exception ex)
             {
-                return StatusCode((int)HttpStatusCode.BadRequest, ex.Message);
+                Responce.Status = (int)HttpStatusCode.BadRequest;
+                Responce.Message = ex.Message;
+                Responce.StatusText = "BadRequest";
+                Responce.Headers = "Deletion Failed , Record is not Deleted, ";
+                Responce.Ok = false;
+                return Responce;
+          
             }
-            return StatusCode((int)HttpStatusCode.OK, msg);
+            Responce.Status = (int)HttpStatusCode.OK;
+            Responce.Message = msg;
+            Responce.StatusText = "Ok";
+            Responce.Ok = true;
+
+            return Responce;
+           
         }
     }
 }

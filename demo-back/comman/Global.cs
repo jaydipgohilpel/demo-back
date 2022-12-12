@@ -6,14 +6,15 @@ namespace demo_back.comman
 {
     public class Global
     {
-        public static HttpResponseMessage CreateResponse(HttpRequestMessage pRequest, HttpStatusCode pStatusCode, string pStrMessage)
+       /* public static HttpResponseMessage CreateResponse(HttpRequestMessage? pRequest, HttpStatusCode pStatusCode, string pStrMessage)
         {
-           Error pObjResponse = new Error
+            ResponseHelper pObjResponse = new ResponseHelper
             {
                 Status = (int)pStatusCode,
                 Message = pStrMessage
             };
             return pRequest.CreateResponse((HttpStatusCode)pObjResponse.Status, pObjResponse);
         }
+       */
     }
 }
