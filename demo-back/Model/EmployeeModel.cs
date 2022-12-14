@@ -39,6 +39,5 @@ namespace demo_back.model
         [DataMember(Name = "type", EmitDefaultValue = false)]
         public string? Type { get; set; } = "";
 
-
     }
 }

@@ -12,6 +12,8 @@ using demo_back.Handler;
 using Microsoft.Extensions.Configuration;
 using demo_back.comman;
 using System.Globalization;
+using System.Net.Http.Formatting;
+using Microsoft.SqlServer.Server;
 
 
 // For more information on enabling Web API for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
@@ -90,6 +92,8 @@ namespace demo_back.Controllers
         [HttpPost]
         public PostDataResponseHelper Post([FromBody] EmployeeModel emp)
         {
+
+            var formData = new MultipartFormDataContent();
             String msg = string.Empty;
             try
             {

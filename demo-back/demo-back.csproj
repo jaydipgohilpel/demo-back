@@ -18,7 +18,8 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="App_Data\file_uploads\" />
+    <Folder Include="uploads\" />
+    <Folder Include="wwwroot\uploads\" />
   </ItemGroup>
 
 </Project>
